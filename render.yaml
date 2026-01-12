@@ -9,9 +9,9 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
-      - key: BOT_TOKEN
+      - key: 8312113931:AAFKlUxshhvrZ9IiMn9Wj4FelfcISj31S9w
         sync: false
-      - key: ADMIN_ID
+      - key: 814607765
         sync: false
       - key: SYR_CASH_NUMBER
         value: "0991234567"
