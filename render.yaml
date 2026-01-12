@@ -1,14 +1,12 @@
 services:
-  - type: web
-    name: ichancy-telegram-bot
+  - type: worker  # ⬅️ غير من web إلى worker!
+    name: ichancy-bot-worker
     env: python
-    region: frankfurt  # أو أي region قريب منك
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-    healthCheckPath: /health
-    autoDeploy: true
     envVars:
+      # ... باقي المتغيرات
       - key: 8312113931:AAFKlUxshhvrZ9IiMn9Wj4FelfcISj31S9w
         sync: false
       - key: 814607765
