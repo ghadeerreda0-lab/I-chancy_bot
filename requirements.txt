@@ -1,16 +1,9 @@
-# Telegram Bot
 pyTelegramBotAPI==4.15.2
 aiohttp==3.9.1
-
-# Database (استبدل asyncpg بـ psycopg2)
 psycopg2-binary==2.9.9
 redis==5.0.1
-
-# Web & Async
 Flask==3.0.0
 cachetools==5.3.2
 python-dotenv==1.0.1
-
-# Utilities
 pytz==2023.3.post1
-ujson==5.8.0  # أسرع من json
+ujson==5.8.0
