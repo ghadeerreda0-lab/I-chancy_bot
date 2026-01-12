@@ -71,16 +71,16 @@ app_start_time = datetime.now()
 # =========================
 class Config:
     TOKEN = os.getenv("8312113931:AAFKlUxshhvrZ9IiMn9Wj4FelfcISj31S9w", "")
-    ADMIN_ID = int(os.getenv("814607765", "0"))
+    ADMIN_ID = int(os.getenv("8146077656", "0"))
     
     # Payment numbers
     SYR_CASH_NUMBER = os.getenv("SYR_CASH_NUMBER", "0990000000")
     SCH_CASH_NUMBER = os.getenv("SCH_CASH_NUMBER", "0940000000")
     
-    # Channels
-    CHANNEL_SYR_CASH = CHANNEL_SYR_CASH = int(os.getenv("CHANNEL_SYR_CASH", "-1003597919374"))
+    # Channels - تم التصحيح هنا
+    CHANNEL_SYR_CASH = int(os.getenv("CHANNEL_SYR_CASH", "-1003597919374"))
     CHANNEL_SCH_CASH = int(os.getenv("CHANNEL_SCH_CASH", "-1003464319533"))
-    CHANNEL_ADMIN_LOGS = int(os.getenv("CHANNEL_ADMIN_LOGS", "-1003577468648))
+    CHANNEL_ADMIN_LOGS = int(os.getenv("CHANNEL_ADMIN_LOGS", "-1003577468648"))
     CHANNEL_WITHDRAW = int(os.getenv("CHANNEL_WITHDRAW", "-1003443113179"))
     CHANNEL_SUPPORT = int(os.getenv("CHANNEL_SUPPORT", "-1003514396473"))
     
@@ -496,7 +496,7 @@ async def start_command(message: types.Message):
         await bot.send_message(
             message.chat.id,
             welcome_text,
-            reply_markup=main_menu(message.from_user.id),
+            reply_mup=main_menu(message.from_user.id),
             parse_mode="HTML"
         )
         
@@ -562,209 +562,4 @@ async def callback_handler(call: CallbackQuery):
                 )
                 return
             
-            kb = InlineKeyboardMarkup()
-            kb.add(
-                InlineKeyboardButton("💰 سيرياتيل كاش", callback_data="withdraw_syr"),
-                InlineKeyboardButton("💰 شام كاش", callback_data="withdraw_sch")
-            )
-            kb.add(InlineKeyboardButton("⬅️ رجوع", callback_data="back"))
-            
-            await bot.send_message(
-                call.message.chat.id,
-                "📤 <b>اختر طريقة السحب:</b>\n\n"
-                "💡 <b>تعليمات:</b>\n"
-                "1. اختر طريقة السحب\n"
-                "2. أدخل المبلغ\n"
-                "3. أدخل رقم حسابك\n"
-                "4. انتظر الموافقة (عادة خلال 30 دقيقة)",
-                reply_markup=kb,
-                parse_mode="HTML"
-            )
-            await bot.answer_callback_query(call.id)
-        
-        elif data in ["pay_syr", "pay_sch"]:
-            payment = "سيرياتيل كاش" if data == "pay_syr" else "شام كاش"
-            number = config.SYR_CASH_NUMBER if data == "pay_syr" else config.SCH_CASH_NUMBER
-            
-            await bot.send_message(
-                call.message.chat.id,
-                f"💳 <b>{payment}</b>\n\n"
-                f"📱 <b>الرقم:</b> <code>{number}</code>\n"
-                f"💰 <b>الحد الأدنى:</b> {config.MIN_TRANSACTION:,} ليرة\n"
-                f"💰 <b>الحد الأقصى:</b> {config.MAX_TRANSACTION:,} ليرة\n\n"
-                f"📝 <b>بعد التحويل، أدخل المبلغ الذي حولته:</b>",
-                parse_mode="HTML"
-            )
-            await bot.answer_callback_query(call.id)
-        
-        elif data == "back":
-            await bot.send_message(
-                call.message.chat.id,
-                "✅ <b>عدنا إلى القائمة الرئيسية:</b>",
-                reply_markup=main_menu(user_id),
-                parse_mode="HTML"
-            )
-            await bot.answer_callback_query(call.id)
-        
-        elif data in ["withdraw_syr", "withdraw_sch"]:
-            payment = "سيرياتيل كاش" if data == "withdraw_syr" else "شام كاش"
-            
-            await bot.send_message(
-                call.message.chat.id,
-                f"💳 <b>طريقة السحب:</b> {payment}\n\n"
-                f"💵 <b>أدخل المبلغ المراد سحبه:</b>\n"
-                f"(الحد الأدنى: {config.MIN_TRANSACTION:,} ليرة)",
-                parse_mode="HTML"
-            )
-            await bot.answer_callback_query(call.id)
-        
-        # معالجة الأزرار الأخرى
-        else:
-            feature_messages = {
-                "referrals": "💰 نظام الإحالات",
-                "gift": "🎁 إهداء الرصيد",
-                "gift_code": "🎁 كود الهدية",
-                "tutorials": "☁️ الشروحات",
-                "bets": "🔁 سجل الرهانات",
-                "jackpot": "🃏 الجاكبوت",
-                "vp": "↗️ VPN",
-                "apk": "↗️ تطبيق IChancy",
-                "rules": "📌 الشروط والأحكام",
-                "contact": "✉️ تواصل معنا",
-                "logs": "🔁 السجل",
-                "ichancy": "⚡ Ichancy",
-                "admin_panel": "🎛 لوحة التحكم"
-            }
-            
-            message_text = feature_messages.get(data, "هذه الميزة")
-            await bot.answer_callback_query(
-                call.id,
-                f"🛠️ {message_text} قيد التطوير. ستكون متاحة قريباً!",
-                show_alert=True
-            )
-            
-    except Exception as e:
-        logger.error(f"خطأ في callback: {e}")
-        await bot.answer_callback_query(call.id, "⚠️ حدث خطأ في النظام", show_alert=True)
-
-# =========================
-# معالجة الرسائل النصية
-# =========================
-@bot.message_handler(func=lambda m: True, content_types=['text'])
-async def text_message_handler(message: types.Message):
-    """معالجة الرسائل النصية"""
-    try:
-        user_id = message.from_user.id
-        
-        # Rate limiting
-        if not await cache_manager.check_rate_limit(user_id, "message"):
-            return
-        
-        # يمكن إضافة معالجة الرسائل هنا
-        if message.text.startswith('/'):
-            return
-        
-        await bot.send_message(
-            message.chat.id,
-            "📝 يمكنك استخدام الأزرار في القائمة للتنقل بين الميزات.",
-            reply_markup=main_menu(user_id)
-        )
-        
-    except Exception as e:
-        logger.error(f"خطأ في معالجة الرسالة: {e}")
-
-# =========================
-# مهام خلفية
-# =========================
-async def background_tasks():
-    """مهام خلفية دورية"""
-    while True:
-        try:
-            await asyncio.sleep(300)  # كل 5 دقائق
-            
-            # تنظيف الذاكرة المؤقتة
-            current_time = datetime.now()
-            logger.info(f"📊 النظام يعمل - Uptime: {(current_time - app_start_time).total_seconds():.0f} ثانية")
-            
-            # إعادة الاتصال إذا انقطع
-            if ConnectionManager._redis:
-                try:
-                    await ConnectionManager._redis.ping()
-                except:
-                    logger.warning("🔄 إعادة الاتصال بـ Redis...")
-                    await connection_manager.init_redis()
-                    
-        except Exception as e:
-            logger.error(f"خطأ في المهام الخلفية: {e}")
-            await asyncio.sleep(60)
-
-# =========================
-# التشغيل الرئيسي
-# =========================
-async def main():
-    """الدالة الرئيسية للتشغيل"""
-    # إبقاء البوت نشطاً
-    keep_alive()
-    
-    print("=" * 60)
-    print("🚀 بدء تشغيل IChancy Bot - النسخة الاحترافية")
-    print("=" * 60)
-    
-    try:
-        # تهيئة الخدمات
-        await init_services()
-        
-        # معلومات البوت
-        bot_info = await bot.get_me()
-        print(f"🤖 البوت: @{bot_info.username}")
-        print(f"🆔 ID: {bot_info.id}")
-        print(f"📛 الاسم: {bot_info.first_name}")
-        
-        print("\n✅ جميع الخدمات جاهزة")
-        print(f"💾 Cache Size: {config.CACHE_SIZE}")
-        print(f"🔗 DB Pool: {config.DB_POOL_MIN}-{config.DB_POOL_MAX}")
-        print("📱 اكتب /start في تيليجرام للبدء")
-        print("=" * 60)
-        
-        # بدء المهام الخلفية
-        asyncio.create_task(background_tasks())
-        
-        # بدء البوت مع إعدادات متقدمة
-        await bot.polling(
-            none_stop=True,
-            timeout=90,
-            request_timeout=90,
-            skip_pending=True,
-            allowed_updates=["message", "callback_query"]
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ خطأ رئيسي: {e}", exc_info=True)
-        print(f"❌ خطأ: {e}")
-        
-        # محاولة إعادة التشغيل بعد 10 ثواني
-        await asyncio.sleep(10)
-        print("🔄 إعادة تشغيل البوت...")
-        os.execv(sys.executable, ['python'] + sys.argv)
-        
-    finally:
-        # تنظيف الموارد
-        print("\n🔴 إغلاق النظام...")
-        if ConnectionManager._db_pool:
-            ConnectionManager._db_pool.closeall()
-        if ConnectionManager._redis:
-            await ConnectionManager._redis.close()
-        print("✅ تم إغلاق جميع الاتصالات")
-
-# =========================
-# نقطة الدخول
-# =========================
-if __name__ == "__main__":
-    import sys
-    
-    # تشغيل البوت
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\n👋 إيقاف البوت...")
-        sys.exit(0)
+            kb = InlineKeyboardM
