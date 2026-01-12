@@ -26,3 +26,50 @@ services:
           type: redis
           name: ichancy-redis
           property: connectionString
+
+services:
+  - type: web
+    name: ichancy-telegram-bot
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py  # ⬅️ هذا هو المهم!
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: 8312113931:AAFKlUxshhvrZ9IiMn9Wj4FelfcISj31S9w
+        sync: false
+      - key: 814607765
+        sync: false
+      - key: SYR_CASH_NUMBER
+        value: "0990000000"
+      - key: SCH_CASH_NUMBER
+        value: "0940000000"
+      - key: CHANNEL_SYR_CASH
+        value: "-1003597919374"
+      - key: CHANNEL_SCH_CASH
+        value: "-1003464319533"
+      - key: CHANNEL_ADMIN_LOGS
+        value: "-1003577468648"
+      - key: CHANNEL_WITHDRAW
+        value: "-1003443113179"
+      - key: CHANNEL_SUPPORT
+        value: "-1003514396473"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ichancy-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: ichancy-redis
+          property: connectionString
+
+databases:
+  - name: ichancy-db
+    plan: free
+
+redis:
+  - name: ichancy-redis
+    plan: free
