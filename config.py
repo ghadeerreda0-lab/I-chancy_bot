@@ -1,7 +1,7 @@
 """
 config.py - إعدادات البوت والثوابت
 """
-
+import os
 import datetime
 
 # =========================
