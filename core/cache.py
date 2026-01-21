@@ -1,4 +1,4 @@
- """
+"""
 نظام التخزين المؤقت المتقدم مع LRU وTTL
 """
 
@@ -9,7 +9,19 @@ from typing import Any, Optional, Dict, List
 import hashlib
 import json
 
-from .config import PERFORMANCE
+# ✅ التصحيح: استيراد config بطريقة صحيحة
+try:
+    # محاولة الاستيراد المباشر
+    from config import PERFORMANCE
+except ImportError:
+    try:
+        # محاولة الاستيراد من core
+        from core.config import PERFORMANCE
+    except ImportError:
+        # قيم افتراضية إذا فشل الاستيراد
+        PERFORMANCE = {"CACHE_MAX_SIZE": 1000}
+        print("⚠️ استخدام إعدادات CACHE افتراضية")
+
 from .logger import get_logger
 
 logger = get_logger(__name__)
@@ -125,7 +137,7 @@ class CacheManager:
     
     def _initialize(self):
         """تهيئة المدير"""
-        max_size = PERFORMANCE["CACHE_MAX_SIZE"]
+        max_size = PERFORMANCE.get("CACHE_MAX_SIZE", 1000)
         self.cache = LRUCache(max_size=max_size)
         
         # كاشات خاصة
@@ -278,5 +290,5 @@ class CacheManager:
         }
 
 
-# إنشاء نسخة عامة
+# ✅ إنشاء نسخة عامة (هذا ما سيتم استيراده من main.py)
 cache = CacheManager()
